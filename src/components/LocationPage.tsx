@@ -1,7 +1,11 @@
-import React,{ useState } from 'react';
+import React,{ useEffect, useState } from 'react';
+import { useQuery, gql } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
+
 import Navbar from './Navbar';
 import Filters from './Filters';
 import LocationCard from './LocationCard';
+import { TENANT } from '../constants';
 
 interface LocationPageProps {
 
@@ -15,8 +19,40 @@ const dummyLocation = [
     {firstName: "Deepinder", lastName: "Goyal", coordinates: "1212344.76355", date: "Dec 08", time: "7:12 PM", duration: 0.4}
 ]
 
+const GET_LOCATION = gql`
+query LocationList($tenant: String!) {
+    locationList(tenant: $tenant) {
+      resources {
+        name
+        updatedAt
+        telecom {
+          value
+        }
+        alias
+        address
+        id
+      }
+    }
+  }`
+
 const LocationPage: React.FC<LocationPageProps> = () => {
     const [search, setSearch] = useState("");
+    const [locationList, setLocationList] = useState([])
+    const { error, data, loading } = useQuery(GET_LOCATION, {
+        variables: {
+            tenant: TENANT
+        },
+        onCompleted: (data) => {
+            console.log(data);
+            setLocationList(data?.locationList?.resources);
+        }
+    });
+    const navigate = useNavigate()
+
+    const handleClick = (id: string) => {
+        navigate(`/${id}`)
+    }
+    
   return (
     <div className='w-full'>
         <div className='flex flex-col justify-around'>
@@ -29,14 +65,15 @@ const LocationPage: React.FC<LocationPageProps> = () => {
                 placeholder='Search'
             />
             <Filters />
-            {dummyLocation.map((location) => (
+            {locationList.length > 0 && locationList.map((location) => (
                 <LocationCard 
-                    firstName={location.firstName}
-                    lastName={location.lastName}
-                    coordinates={location.coordinates}
-                    date={location.date}
-                    time={location.time}
-                    duration={location.duration}
+                    firstName={location.name}
+                    lastName={``}
+                    coordinates={location.updatedAt}
+                    date={`06 Jan`}
+                    time={location.updatedAt}
+                    duration={`0.2`}
+                    onClick={() => handleClick(location.id)}
                 />
             ))}
 

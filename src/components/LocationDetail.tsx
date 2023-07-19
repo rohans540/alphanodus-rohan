@@ -1,6 +1,9 @@
 import React, {ChangeEventHandler, useState, useEffect} from 'react';
+import { useParams } from 'react-router-dom';
 
+import { TENANT } from '../constants';
 import FormField from './FormField';
+import { gql, useQuery } from '@apollo/client';
 
 interface LocationDetailsProps {
 
@@ -22,6 +25,32 @@ const initialState = {
 
 const LocationDetail: React.FC<LocationDetailsProps> = () => {
   const [form, setForm] = useState(initialState);
+  const { id } = useParams();
+  const GET_LOCATION_BY_ID = gql`
+  query LocationRead($locationReadId: String!, $tenant: String!) {
+    locationRead(id: $locationReadId, tenant: $tenant) {
+      id
+      resource {
+        address
+        updatedAt
+        type
+        taxId
+        name
+        description
+        status
+      }
+    }
+  }`
+
+  const { error, data, loading } = useQuery(GET_LOCATION_BY_ID, {
+    variables: {
+      tenant: TENANT,
+      id
+    },
+    onCompleted: (data) => {
+      console.log("data from detail page", data);
+    }
+  })
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event: ChangeEventHandler<HTMLInputElement>) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

@@ -9,11 +9,13 @@ interface LocationCardProps {
     date: string;
     time: string;
     duration: number;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    onClick: Function;
 }
 
-const LocationCard: React.FC<LocationCardProps> = ({ firstName, lastName, coordinates, date, time, duration }) => {
+const LocationCard: React.FC<LocationCardProps> = ({ firstName, lastName, coordinates, date, time, duration, onClick }) => {
   return (
-    <div className='flex flex-col items-center border-[1px] border-black mt-4 p-2 w-full rounded-[2px]'>
+    <div className='flex flex-col items-center border-[1px] border-black mt-4 p-2 w-full rounded-[2px]' onClick={onClick}>
         <div className='flex flex-row justify-between font-epilogue font-[8px] w-full'>
             <h3 className='ml-[8px]'>{firstName} {lastName}</h3>
             <div className='flex justify-center items-center rounded-full w-[90px] bg-[#eddeb4] mr-[8px]'>Active</div>
